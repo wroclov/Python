@@ -2,7 +2,7 @@ from nltk.classify import NaiveBayesClassifier
 from nltk.corpus import movie_reviews
 from nltk.classify.util import accuracy
 from nltk.metrics import precision, recall, f_measure
-from nltk import FreqDist, BigramAssocMeasures, BigramCollocationFinder
+from nltk import BigramAssocMeasures, BigramCollocationFinder
 from collections import defaultdict
 import random
 import collections
