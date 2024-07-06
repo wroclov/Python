@@ -6,10 +6,52 @@ import matplotlib.colors as mcolors
 import string
 import seaborn as sns
 
-# Set seaborn style and matplotlib parameters
-sns.set()
-plt.rcParams['font.family'] = ['Times New Roman', 'sans-serif']
-plt.rcParams['figure.dpi'] = 144
+def create_corr_matrix(values):
+    """Create a symmetric correlation matrix from the given values."""
+    values = (values + values.T - np.diag(np.diag(values))) / 2
+    np.fill_diagonal(values, 1)
+    return pd.DataFrame(values, columns=list(string.ascii_uppercase[:values.shape[1]]))
+
+def plot_heatmap_and_grid(corr_matrix):
+    """Plot the heatmap and create a grid around it."""
+    sns.heatmap(corr_matrix, cmap='coolwarm_r')
+    plt.show()
+
+    fig, ax = plt.subplots(figsize=(10, 8))
+    ax.set_facecolor('white')
+    ax.imshow(np.ones_like(corr_matrix), cmap='gray_r', interpolation='nearest')
+
+    range_size = np.arange(len(corr_matrix.columns))
+    ax.set_xticks(range_size)
+
+    ax.set_yticks(range_size)
+    ax.tick_params(axis='x', which='both', labelbottom=False, labeltop=True, bottom=False, top=True, length=0)
+    ax.set_yticklabels(corr_matrix.columns, fontsize=20, color="green", fontweight="bold")
+    ax.set_xticklabels(range_size, fontsize=20, color="green", fontweight="bold")
+
+    ax.set_xticks(np.arange(len(corr_matrix.columns) + 1) - .5, minor=True)
+    ax.set_yticks(np.arange(len(corr_matrix.columns) + 1) - .5, minor=True)
+    ax.grid(which="minor", color="lightgray", linestyle="solid", linewidth=2)
+
+    rect = Rectangle((-.5, -.5), len(corr_matrix.columns), len(corr_matrix.columns), linewidth=5, edgecolor='lightgray', facecolor='none')
+    ax.add_patch(rect)
+
+    return fig, ax
+
+def plot_circles_and_colorbar(ax, corr_matrix):
+    """Plot circles with radius proportional to correlation and add colorbar."""
+    for i in range(len(corr_matrix.columns)):
+        for j in range(len(corr_matrix.columns)):
+            correlation = corr_matrix.iat[i, j]
+            norm = plt.Normalize(-1, 1)
+            sm = plt.cm.ScalarMappable(norm=norm, cmap='coolwarm_r')
+            color = sm.to_rgba(correlation)
+            circle = Circle((i, j), radius=abs(correlation) / 2.5, facecolor=color)
+            ax.add_patch(circle)
+
+    norm = mcolors.Normalize(vmin=-1, vmax=1)
+    c_scale = plt.cm.ScalarMappable(norm=norm, cmap='coolwarm_r')
+    cbar = plt.colorbar(c_scale, ax=ax)
 
 # Data array
 values = np.array([
@@ -26,51 +68,10 @@ values = np.array([
     [ 0.3, -0.6, -0.1, -0.3, -0.5, -0.2,  0.2,  0.6,  0.7,  0.8,  1. ]
 ])
 
-# Make the data symmetric and set diagonal to 1
-values = (values + values.T - np.diag(np.diag(values))) / 2
-np.fill_diagonal(values, 1)
+# Create correlation matrix and plot
+corr_matrix = create_corr_matrix(values)
+fig, ax = plot_heatmap_and_grid(corr_matrix)
 
-# Create a DataFrame for the correlation matrix
-corr_matrix = pd.DataFrame(values, columns=list(string.ascii_uppercase[:values.shape[1]]))
-print(corr_matrix)
-
-# Heatmap of the correlation matrix
-sns.heatmap(corr_matrix, cmap='coolwarm_r')
-plt.show()
-
-# Create a white grid with the same dimensions as the correlation matrix
-fig, ax = plt.subplots(figsize=(10, 8))
-ax.set_facecolor('white')
-ax.imshow(np.ones_like(corr_matrix), cmap='gray_r', interpolation='nearest')
-
-# Set the tick labels and rotation for the x and y axes
-ax.set_xticks(np.arange(len(corr_matrix.columns)))
-ax.set_yticks(np.arange(len(corr_matrix.columns)))
-ax.tick_params(axis='x', which='both', labelbottom=False, labeltop=True, bottom=False, top=True, length=0)
-ax.set_yticklabels(corr_matrix.columns, fontsize=20, color="orange", fontweight="bold")
-ax.set_xticklabels(corr_matrix.columns, fontsize=20, color="orange", fontweight="bold")
-
-# Create grid lines between the tick labels
-ax.set_xticks(np.arange(len(corr_matrix.columns) + 1) - .5, minor=True)
-ax.set_yticks(np.arange(len(corr_matrix.columns) + 1) - .5, minor=True)
-ax.grid(which="minor", color="lightgray", linestyle="solid", linewidth=2)
-
-# Add rectangle around the grid
-rect = Rectangle((-.5, -.5), len(corr_matrix.columns), len(corr_matrix.columns), linewidth=5, edgecolor='lightgray', facecolor='none')
-ax.add_patch(rect)
-
-# Create circles with radius proportional to the absolute value of correlation
-for i in range(len(corr_matrix.columns)):
-    for j in range(len(corr_matrix.columns)):
-        correlation = corr_matrix.iat[i, j]
-        norm = plt.Normalize(-1, 1)
-        sm = plt.cm.ScalarMappable(norm=norm, cmap='coolwarm_r')
-        color = sm.to_rgba(correlation)
-        circle = Circle((i, j), radius=abs(correlation) / 2.5, facecolor=color)
-        ax.add_patch(circle)
-
-# Add color bar
-norm = mcolors.Normalize(vmin=-1, vmax=1)
-c_scale = plt.cm.ScalarMappable(norm=norm, cmap='coolwarm_r')
-cbar = plt.colorbar(c_scale, ax=ax)
+# Plot circles and colorbar
+plot_circles_and_colorbar(ax, corr_matrix)
 plt.show()
