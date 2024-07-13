@@ -1,6 +1,7 @@
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 import geopy.distance
+import folium
 
 # List of the 50 largest cities in the world and their coordinates (latitude and longitude)
 cities = [
@@ -56,6 +57,7 @@ cities = [
     ("Baghdad", 33.3152, 44.3661)
 ]
 
+
 # Calculate the distance matrix between each pair of cities
 def compute_distance_matrix(cities):
     distances = []
@@ -72,13 +74,8 @@ def compute_distance_matrix(cities):
         distances.append(row)
     return distances
 
-distance_matrix = compute_distance_matrix(cities)
-print(distance_matrix)
 
-# Verify the distance matrix calculation
-for i in range(len(cities)):
-    for j in range(len(cities)):
-        print(f"Distance from {cities[i][0]} to {cities[j][0]}: {distance_matrix[i][j]} km")
+distance_matrix = compute_distance_matrix(cities)
 
 # Create the routing index manager
 manager = pywrapcp.RoutingIndexManager(len(cities), 1, 0)
@@ -86,11 +83,13 @@ manager = pywrapcp.RoutingIndexManager(len(cities), 1, 0)
 # Create Routing Model
 routing = pywrapcp.RoutingModel(manager)
 
+
 def distance_callback(from_index, to_index):
     # Convert from routing variable Index to distance matrix NodeIndex
     from_node = manager.IndexToNode(from_index)
     to_node = manager.IndexToNode(to_index)
     return distance_matrix[from_node][to_node]
+
 
 transit_callback_index = routing.RegisterTransitCallback(distance_callback)
 
@@ -105,20 +104,52 @@ search_parameters.first_solution_strategy = (
 # Solve the problem
 solution = routing.SolveWithParameters(search_parameters)
 
-# Print the solution
+# Print the solution and plot the route on a map
 if solution:
     print('Objective: {}'.format(solution.ObjectiveValue()))
     index = routing.Start(0)
     plan_output = 'Route:\n'
     route_distance = 0
+    route = []
+    leg = 1
+    leg_info = []
     while not routing.IsEnd(index):
-        plan_output += ' {} ->'.format(cities[manager.IndexToNode(index)][0])
+        route.append(manager.IndexToNode(index))
         previous_index = index
         index = solution.Value(routing.NextVar(index))
-        route_distance += distance_matrix[manager.IndexToNode(previous_index)][manager.IndexToNode(index)]
-        plan_output+='('+str(round(distance_matrix[manager.IndexToNode(previous_index)][manager.IndexToNode(index)],2))+')'
-    plan_output += ' {}\n'.format(cities[manager.IndexToNode(index)][0])
+        dist = distance_matrix[manager.IndexToNode(previous_index)][manager.IndexToNode(index)]
+        route_distance += dist
+        leg_info.append(
+            f'{leg}: {cities[manager.IndexToNode(previous_index)][0]} -> {cities[manager.IndexToNode(index)][0]} ({dist:.2f} km)')
+        plan_output += f'{leg}: {cities[manager.IndexToNode(previous_index)][0]} -> {cities[manager.IndexToNode(index)][0]} ({dist:.2f} km)\n'
+        leg += 1
+    route.append(manager.IndexToNode(index))  # Add the start point to complete the loop
+
     print(plan_output)
     print('Route distance: {} km'.format(route_distance))
+
+    # Create a map
+    m = folium.Map(location=[20, 0], zoom_start=2)
+
+    # Add route to the map
+    for i in range(len(route) - 1):
+        start_city = cities[route[i]]
+        end_city = cities[route[i + 1]]
+        folium.Marker(location=[start_city[1], start_city[2]], popup=start_city[0]).add_to(m)
+        folium.PolyLine(
+            locations=[[start_city[1], start_city[2]], [end_city[1], end_city[2]]],
+            color='blue',
+            tooltip=f'{i + 1}: {start_city[0]} -> {end_city[0]} ({distance_matrix[route[i]][route[i + 1]]:.2f} km)'
+        ).add_to(m)
+
+    # Add the start city marker
+    start_city = cities[route[0]]
+    folium.Marker(location=[start_city[1], start_city[2]], popup=start_city[0], icon=folium.Icon(color='green')).add_to(
+        m)
+
+    # Save the map to an HTML file
+    m.save("tsp_route.html")
+
+    print("Map saved as tsp_route.html")
 else:
     print('No solution found!')
