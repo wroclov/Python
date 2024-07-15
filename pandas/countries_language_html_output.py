@@ -9,7 +9,15 @@ language_data = {
     'CAN': 'English',
     'BRA': 'Portuguese',
     'RUS': 'Russian',
-    'POR': 'Portuguese'
+    'POR': 'Portuguese',
+    'AFG': 'Afghani',
+    'IND': 'Hindi',
+    'CHN': 'Chinese',
+    'AGO': 'Portuguese',
+    'ARG': 'Spanish',
+    'MEX': 'Spanish',
+    'AUS': 'English'
+
 
     # Add more countries and their dominant languages
 }
@@ -20,7 +28,10 @@ language_colors = {
     'French': 'green',
     'Spanish': 'red',
     'Portuguese': 'purple',
-    'Russian': 'grey'
+    'Russian': 'black',
+    'Afghani': 'pink',
+    'Hindi': 'orange',
+    'Chinese': 'yellow'
     # Add more languages if needed
 }
 
@@ -55,14 +66,17 @@ folium.GeoJson(
 # Add a legend to the map
 legend_html = '''
      <div style="position: fixed;
-     bottom: 50px; left: 50px; width: 150px; height: 150px;
+     bottom: 50px; left: 50px; width: 150px; height: 300px;
      border:2px solid grey; z-index:9999; font-size:14px;
      ">&nbsp; Dominant Languages <br>
      &nbsp; <i class="fa fa-circle fa-1x" style="color:blue"></i>&nbsp; English <br>
      &nbsp; <i class="fa fa-circle fa-1x" style="color:green"></i>&nbsp; French <br>
      &nbsp; <i class="fa fa-circle fa-1x" style="color:red"></i>&nbsp; Spanish <br>
      &nbsp; <i class="fa fa-circle fa-1x" style="color:purple"></i>&nbsp; Portuguese <br>
-     &nbsp; <i class="fa fa-circle fa-1x" style="color:grey"></i>&nbsp; Russian <br>
+     &nbsp; <i class="fa fa-circle fa-1x" style="color:black"></i>&nbsp; Russian <br>
+     &nbsp; <i class="fa fa-circle fa-1x" style="color:pink"></i>&nbsp; Afghani <br>
+     &nbsp; <i class="fa fa-circle fa-1x" style="color:orange"></i>&nbsp; Hindi <br>
+     &nbsp; <i class="fa fa-circle fa-1x" style="color:yellow"></i>&nbsp; Chinese <br>
      </div>
 '''
 m.get_root().html.add_child(folium.Element(legend_html))
