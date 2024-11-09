@@ -3,6 +3,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor
+import matplotlib.pyplot as plt
 
 '''
 This Python script is a deep learning program using PyTorch to train and evaluate a neural network model on the FashionMNIST dataset. 
@@ -129,9 +130,25 @@ def test_models(load_epoch):
                 correct += 1
             else:
                 incorrect += 1
-    print(f"Prediction complete for model_epoch_{load_epoch}. Correct predictions: {correct}, Incorrect predictions: {incorrect}")
-    print(f"Accuracy: {correct/(incorrect+correct)*100: .2f}%")
 
-# Load a specific model based on epoch (for example, epoch 5)
-for load_epoch in range(1,epochs):
-    test_models(load_epoch)
+    accuracy = correct / (correct + incorrect) * 100
+    print(f"Prediction complete for model_epoch_{load_epoch}. "
+          f"Correct predictions: {correct}, Incorrect predictions: {incorrect}")
+    print(f"Accuracy: {accuracy:.2f}%")
+
+    return load_epoch, accuracy  # Return epoch and accuracy
+
+accuracy_results = []
+epoch_numbers = []
+# Load a specific model based on epoch (you can limit to some smaller number)
+for load_epoch in range(1,100):
+    epoch, accuracy = test_models(load_epoch)
+    accuracy_results.append(accuracy)
+    epoch_numbers.append(epoch)
+
+plt.plot(epoch_numbers, accuracy_results, marker = 'o')
+plt.title('Model Accuracy vs Epochs')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy (%)')
+plt.grid(True)
+plt.show()
