@@ -1,6 +1,6 @@
 import pytest
 from decimal import Decimal
-from math_operations import add, substract, multiply, divide
+from math_operations import add, subtract, multiply, divide, power
 
 @pytest.mark.parametrize("a, b ,expected", [
     (2, 3, 5),
@@ -9,6 +9,39 @@ from math_operations import add, substract, multiply, divide
 ])
 def test_add(a, b, expected):
     assert add(a, b) == expected
+
+# Test Subtraction
+@pytest.mark.parametrize("a, b, expected", [
+    (7, 3, 4),
+    (0, 0, 0),
+    (-1, -1, 0),
+    (100, 350, -250)
+])
+def test_subtract(a, b, expected):
+    assert subtract(a, b) == expected
+
+@pytest.mark.parametrize("a, b, expected",[
+    (0, 1, 0,),
+    (1, -5, -5),
+    (-4, -7, 28),
+    (3.2, 2.1, 6.72)
+])
+def test_multiply(a, b, expected):
+    assert multiply(a, b) == pytest.approx(expected, rel=1e-9)  # Adding a tolerance for comparison
+
+@pytest.mark.parametrize("a, b, expected",[
+    (0, 21, 0),
+    (1, 44, 1),
+    (10, 0, 1),
+    (2, 3, 8),
+    (81, 0.5, 9),
+    (-2, 5, -32),
+    (2, -3, 0.125),
+    (0, 0, 1)
+])
+def test_power(a, b, expected):
+    assert power(a, b) == expected
+
 
 @pytest.mark.divide
 def test_divide_valid():
