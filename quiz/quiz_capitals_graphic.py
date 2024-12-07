@@ -37,7 +37,7 @@ class QuizApp:
         for i in range(4):
             btn = tk.Radiobutton(self.root, text="", variable=self.options, value="", font=('Helvetica', 14),
                                  anchor='w', justify=tk.LEFT, fg='green')
-            btn.pack(fill='x', padx=40, pady=5)
+            btn.pack(fill='x', padx=300, pady=5)
             self.option_buttons.append(btn)
 
         self.submit_button = tk.Button(self.root, text="Submit", command=self.check_answer, font=('Helvetica', 14))
@@ -48,25 +48,46 @@ class QuizApp:
             country_info = self.questions[self.current_question]
             country = country_info["name"]
             correct_capital = country_info["capital"]
+            correct_currency = country_info["currency"]["name"]  # Assuming "currency" key structure
 
-            all_capitals = [info["capital"] for info in self.country_data if info["capital"] != correct_capital]
-            options = random.sample(all_capitals, 3) + [correct_capital]
+            # Randomize question type: capital or currency
+            self.question_type = random.choice(["capital", "currency"])  # Save the question type
+            if self.question_type == "capital":
+                correct_answer = correct_capital
+                all_wrong_answers = [info["capital"] for info in self.country_data if info["capital"] != correct_capital]
+                question_text = f"Q{self.current_question +1}: What is the capital of {country}?"
+            else:
+                correct_answer = correct_currency
+                all_wrong_answers = [
+                    info["currency"]["name"] for info in self.country_data
+                    if info["currency"]["name"] != correct_currency
+                ]
+                question_text = f"Q{self.current_question +1}: What is the currency of {country}?"
+
+            # Prepare options
+            options = random.sample(all_wrong_answers, 3) + [correct_answer]
             random.shuffle(options)
 
-            self.question_label.config(text=f"What is the capital of {country}?")
+            # Save the correct answer for validation later
+            self.correct_answer = correct_answer
+
+            # Update UI elements
+            self.question_label.config(text=question_text)
             self.options.set(None)
             for i, option in enumerate(options):
                 self.option_buttons[i].config(text=f"    {option}", value=option)
-
         else:
             self.show_results()
 
     def check_answer(self):
-        selected_capital = self.options.get()
-        if selected_capital:
-            correct_capital = self.questions[self.current_question]["capital"]
-            if selected_capital == correct_capital:
+        selected_answer = self.options.get()
+        if selected_answer:
+            if selected_answer == self.correct_answer:  # Validate against the saved correct answer
                 self.score += 1
+            else:
+                correct_type = "capital" if self.question_type == "capital" else "currency"
+                print(f"Wrong! The correct {correct_type} was: {self.correct_answer}")
+
             self.current_question += 1
             self.score_label.config(text=f"Score: {self.score}/20")
             self.show_question()
