@@ -1,6 +1,5 @@
-# big diff in performance diff between list and generators
+# big diff in performance between list and generators
 from memory_profiler import profile
-from collections.abc import Callable
 
 import random
 import time
