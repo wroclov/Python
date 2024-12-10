@@ -9,7 +9,16 @@ COUNTRIES = [
     "INDIA", "CHINA", "RUSSIA", "SPAIN", "ITALY",
     "MEXICO", "EGYPT", "TURKEY", "GREECE", "NORWAY",
     "SWEDEN", "POLAND", "FINLAND", "AUSTRALIA", "ARGENTINA",
-    "HUNGARY", "THAILAND", "VENEZUELA", "ICELAND", "SINGAPORE"
+    "HUNGARY", "THAILAND", "VENEZUELA", "ICELAND", "SINGAPORE",
+    "CUBA", "NAURU", "TUVALU", "FIJI", "NEWZEALAND", "HAITI",
+    "LATVIA", "PORTUGAL", "ISRAEL", "PAKISTAN", "NEPAL", "BHUTAN",
+    "MONGOLIA", "IRELAND", "DENMARK", "UKRAINE", "MOLDOVA","ROMANIA",
+    "ALBANIA", "SERBIA", "CROATIA", "MALI", "UGANDA", "RWANDA",
+    "BURUNDI", "PALAU", "IRAN", "IRAQ", "CYPRUS", "MALTA",
+    "PERU", "CHILE", "BOLIVIA", "ECUADOR", "COLOMBIA",
+    "SOMALIA", "SUDAN", "JORDAN", "KURGYZSTAN", "SOUTHKOREA",
+    "TAIWAN", "MALDIVES", "CHAD", "NIGERIA", "ANGOLA", "ZAMBIA",
+    "PALAU", "BELGIUM", "AUSTRIA", "MONACO", "LIBYA", "LAOS"
 ]
 
 GRID_SIZE = 20
@@ -31,12 +40,14 @@ def create_grid(size, words):
 def place_word_in_grid(grid, size, word, word_locations):
     """Attempts to place a single word in the grid."""
     directions = {
-        "H": (0, 1),   # Horizontal
-        "V": (1, 0),   # Vertical
-        "D": (1, 1),   # Diagonal
-        "HR": (0, -1), # Horizontal Reverse
-        "VR": (-1, 0), # Vertical Reverse
-        "DR": (-1, -1) # Diagonal Reverse
+        "H": (0, 1),    # Horizontal
+        "V": (1, 0),    # Vertical
+        "D": (1, 1),    # Diagonal (top-left to bottom-right)
+        "HR": (0, -1),  # Horizontal Reverse
+        "VR": (-1, 0),  # Vertical Reverse
+        "DR": (-1, -1), # Diagonal Reverse (bottom-right to top-left)
+        "DL": (1, -1),  # Diagonal (bottom-left to top-right)
+        "UR": (-1, 1)   # Diagonal (top-right to bottom-left)
     }
 
     attempts = 0
@@ -176,19 +187,22 @@ class WordSearchGame:
     def get_selected_word(self, row1, col1, row2, col2):
         """Extracts the selected word from the grid."""
         if row1 == row2:  # Horizontal
-            print("Horizontal")
             return "".join(self.grid[row1][min(col1, col2):max(col1, col2) + 1])
 
         if col1 == col2:  # Vertical
-            print("Vertical")
             return "".join(self.grid[row][col1] for row in range(min(row1, row2), max(row1, row2) + 1))
 
         if abs(row1 - row2) == abs(col1 - col2):  # Diagonal
-            print("Diagonal")
             step = range(abs(row1 - row2) + 1)
-            return "".join(
-                self.grid[row1 + (i if row1 < row2 else -i)][col1 + (i if col1 < col2 else -i)] for i in step
-            )
+
+            if row1 < row2 and col1 < col2:  # Top-left to bottom-right
+                return "".join(self.grid[row1 + i][col1 + i] for i in step)
+            elif row1 > row2 and col1 > col2:  # Bottom-right to top-left
+                return "".join(self.grid[row1 - i][col1 - i] for i in step)
+            elif row1 < row2 and col1 > col2:  # Top-right to bottom-left
+                return "".join(self.grid[row1 + i][col1 - i] for i in step)
+            elif row1 > row2 and col1 < col2:  # Bottom-left to top-right
+                return "".join(self.grid[row1 - i][col1 + i] for i in step)
 
         return ""
 
@@ -220,8 +234,19 @@ class WordSearchGame:
             rows = range(min(row1, row2), max(row1, row2) + 1)
             highlight_cells(rows, [col1] * len(rows))
         elif abs(row1 - row2) == abs(col1 - col2):  # Diagonal
-            rows = range(row1, row2 + (1 if row2 > row1 else -1), (1 if row2 > row1 else -1))
-            cols = range(col1, col2 + (1 if col2 > col1 else -1), (1 if col2 > col1 else -1))
+            if row1 < row2 and col1 < col2:  # Top-left to bottom-right
+                rows = range(row1, row2 + 1)
+                cols = range(col1, col2 + 1)
+            elif row1 > row2 and col1 > col2:  # Bottom-right to top-left
+                rows = range(row1, row2 - 1, -1)
+                cols = range(col1, col2 - 1, -1)
+            elif row1 < row2 and col1 > col2:  # Top-right to bottom-left
+                rows = range(row1, row2 + 1)
+                cols = range(col1, col2 - 1, -1)
+            elif row1 > row2 and col1 < col2:  # Bottom-left to top-right
+                rows = range(row1, row2 - 1, -1)
+                cols = range(col1, col2 + 1)
+
             highlight_cells(rows, cols)
 
     def reset_highlights(self):
