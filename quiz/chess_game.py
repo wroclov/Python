@@ -14,20 +14,15 @@ board_color_1 = (238, 238, 210)
 board_color_2 = (118, 150, 86)
 
 # Load piece images
-pieces_images = {
-    'P': pygame.transform.scale(pygame.image.load('pieces/p.png'), (square_size, square_size)),
-    'p': pygame.transform.scale(pygame.image.load('pieces/Pw.png'), (square_size, square_size)),
-    'R': pygame.transform.scale(pygame.image.load('pieces/r.png'), (square_size, square_size)),
-    'r': pygame.transform.scale(pygame.image.load('pieces/Rw.png'), (square_size, square_size)),
-    'N': pygame.transform.scale(pygame.image.load('pieces/n.png'), (square_size, square_size)),
-    'n': pygame.transform.scale(pygame.image.load('pieces/Nw.png'), (square_size, square_size)),
-    'B': pygame.transform.scale(pygame.image.load('pieces/b.png'), (square_size, square_size)),
-    'b': pygame.transform.scale(pygame.image.load('pieces/Bw.png'), (square_size, square_size)),
-    'Q': pygame.transform.scale(pygame.image.load('pieces/q.png'), (square_size, square_size)),
-    'q': pygame.transform.scale(pygame.image.load('pieces/Qw.png'), (square_size, square_size)),
-    'K': pygame.transform.scale(pygame.image.load('pieces/k.png'), (square_size, square_size)),
-    'k': pygame.transform.scale(pygame.image.load('pieces/Kw.png'), (square_size, square_size)),
-}
+def load_piece_images():
+    pieces = ['P', 'p', 'R', 'r', 'N', 'n', 'B', 'b', 'Q', 'q', 'K', 'k']
+    images = {}
+    for piece in pieces:
+        images[piece] = pygame.transform.scale(pygame.image.load(f'pieces/{piece}.png'), (square_size, square_size))
+        images[piece.lower()] = pygame.transform.scale(pygame.image.load(f'pieces/{piece}w.png'), (square_size, square_size))
+    return images
+
+pieces_images = load_piece_images()
 
 # Create the display
 screen = pygame.display.set_mode((width, height))
@@ -67,6 +62,7 @@ def draw_pieces(board, dragging_piece=None, dragging_position=None):
     if dragging_piece and dragging_position:
         piece_image = pieces_images[dragging_piece.symbol()]
         screen.blit(piece_image, (dragging_position[0] - square_size // 2, dragging_position[1] - square_size // 2))
+
 def show_message(message):
     """Display a message on the screen."""
     font = pygame.font.SysFont("Arial", 48)
@@ -98,7 +94,8 @@ def check_draw_conditions(board):
 
 def main():
     board = chess.Board()
-    board.turn = chess.WHITE  # Explicitly set the turn to White
+    board.turn = chess.BLACK  # Explicitly set the turn to White ? For some reason it acts in opposite way
+    print("Initial turn (White=True, Black=False):", board.turn)
     dragging_piece = None
     selected_square = None
     dragging_position = None
@@ -142,6 +139,14 @@ def mouse_down_up_handling(board, dragging_piece, dragging_position, event, sele
         target_square = get_square_under_mouse(event.pos[0], event.pos[1])
         if target_square is not None:
             move = chess.Move(from_square=selected_square, to_square=target_square)
+
+            # Check for pawn promotion
+            if dragging_piece.piece_type == chess.PAWN:
+                last_rank = 7 if dragging_piece.color == chess.WHITE else 0
+                if chess.square_rank(target_square) == last_rank:
+                    promotion_piece = prompt_promotion_piece_ui(dragging_piece.color)
+                    move = chess.Move(from_square=selected_square, to_square=target_square, promotion=promotion_piece)
+
             if move in board.legal_moves:
                 board.push(move)
                 try:
@@ -155,15 +160,69 @@ def mouse_down_up_handling(board, dragging_piece, dragging_position, event, sele
                     show_message(f"{winner} wins!")
                 else:
                     check_draw_conditions(board)
-
             else:
-                print(f"Illegal move attempted: {move}")
+                handle_illegal_move(move)
 
         # Reset dragging state
         dragging_piece = None
         selected_square = None
         dragging_position = None
     return dragging_piece, dragging_position, selected_square
+
+def handle_illegal_move(move):
+    print(f"Illegal move attempted: {move}")
+
+def prompt_promotion_piece_ui(dragging_piece_color):
+    """Display a UI popup to choose a promotion piece."""
+    # Create a semi-transparent overlay
+    overlay = pygame.Surface((width, height))
+    overlay.set_alpha(150)  # Semi-transparency for focus
+    overlay.fill((0, 0, 0))  # Black background
+    screen.blit(overlay, (0, 0))
+
+    # Dimensions and positioning for the menu
+    menu_width, menu_height = 400, 100
+    menu_x = (width - menu_width) // 2
+    menu_y = (height - menu_height) // 2
+
+    # Draw the menu background
+    pygame.draw.rect(screen, (200, 200, 200), (menu_x, menu_y, menu_width, menu_height), border_radius=10)
+    pygame.draw.rect(screen, (0, 0, 0), (menu_x, menu_y, menu_width, menu_height), 2, border_radius=10)
+
+    # Piece options and images
+    promotion_pieces = ['q', 'r', 'b', 'n']
+    promotion_images = {
+        'q': pieces_images['Q' if dragging_piece_color == chess.WHITE else 'q'],
+        'r': pieces_images['R' if dragging_piece_color == chess.WHITE else 'r'],
+        'b': pieces_images['B' if dragging_piece_color == chess.WHITE else 'b'],
+        'n': pieces_images['N' if dragging_piece_color == chess.WHITE else 'n'],
+    }
+
+    # Draw promotion piece options
+    for i, piece in enumerate(promotion_pieces):
+        piece_image = promotion_images[piece]
+        x = menu_x + 10 + i * 100  # Position each piece with padding
+        y = menu_y + 10
+        screen.blit(piece_image, (x, y))
+
+        # Draw border for each option
+        pygame.draw.rect(screen, (0, 0, 0), (x, y, square_size, square_size), 2)
+
+    pygame.display.flip()
+
+    # Wait for user input
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = event.pos
+                for i, piece in enumerate(promotion_pieces):
+                    x = menu_x + 25 + i * 100
+                    y = menu_y + 25
+                    if x <= mouse_x <= x + square_size and y <= mouse_y <= y + square_size:
+                        return {'q': chess.QUEEN, 'r': chess.ROOK, 'b': chess.BISHOP, 'n': chess.KNIGHT}[piece]
 
 def mouse_button_down_handling(board, dragging_piece, event, selected_square):
     square = get_square_under_mouse(event.pos[0], event.pos[1])
