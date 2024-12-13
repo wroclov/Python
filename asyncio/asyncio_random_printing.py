@@ -10,7 +10,9 @@ c = (
     "\033[36m",  # Cyan
     "\033[91m",  # Red
     "\033[35m",  # Magenta
+    "\033[33m",  # Yellow
 )
+
 
 async def makerandom(idx: int, threshold: int = 6) -> int:
     print(c[idx + 1] + f"Initiated makerandom({idx}).")
@@ -23,11 +25,12 @@ async def makerandom(idx: int, threshold: int = 6) -> int:
     return i
 
 async def main():
-    res = await asyncio.gather(*(makerandom(i, 10 - i - 1) for i in range(3)))
+    # several makerandom couroutines executed concurrently with various thresholds
+    res = await asyncio.gather(*(makerandom(i, 10 - i - 1) for i in range(4)))
     return res
 
 if __name__ == "__main__":
-    random.seed(444)
-    r1, r2, r3 = asyncio.run(main())
+    #random.seed(444)
+    r1, r2, r3, r4 = asyncio.run(main())
     print()
-    print(f"r1: {r1}, r2: {r2}, r3: {r3}")
+    print(f"r1: {r1}, r2: {r2}, r3: {r3}, r4: {r4}")
