@@ -5,6 +5,7 @@ Listeners can listen 👂 to the events that are fired during the execution of a
 They are like a hook 🪝 into the test run, allowing us to execute code at a specific point in time during the execution.
 You can use them to e.g. notify other systems about the progress of your test suite in real time.
 https://docs.robotframework.org/docs/extending_robot_framework/listeners_prerun_api/listeners
+e.g. robot --listener .\RobotListenerV3.py .\calculate\ .\DemoLibrary\ .\StaticLibrary\
 """
 
 
