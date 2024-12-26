@@ -19,7 +19,6 @@ Click Table Tennis Ranking and Find Player
     Log To Console    Test passed for player ${PLAYER_NAME} with ranking points ${ranking_points}.
     #Sleep    2
 
-
 *** Keywords ***
 Navigate to Table Tennis Ranking
     Log To Console    Navigating to Table Tennis Ranking...
@@ -27,14 +26,23 @@ Navigate to Table Tennis Ranking
     #Sleep         2
     Click Link    xpath=//a[@href='/dyscypliny/2-tenis-stolowy' and text()='Tenis stołowy']
 
-
 Find Player and Get Ranking Points
     [Arguments]    ${player_name}
     Log To Console    Searching for player: ${player_name}...
+
+    # Click "» więcej..." to load all players if it's visible
+    Wait Until Element Is Visible    xpath=//a[@class='add_entity_link' and @href='/dyscypliny/2-tenis-stolowy/ranking' and text()='» więcej...']    2s
+    Click Link    xpath=//a[@class='add_entity_link' and @href='/dyscypliny/2-tenis-stolowy/ranking' and text()='» więcej...']
+    #Sleep         2
+
+    # Now search for the player in the ranking list
     Wait Until Element Is Visible    xpath=//a[contains(@class, 'name') and contains(text(), '${player_name}')]    2s
     #Sleep         2
     Click Link    xpath=//a[contains(@class, 'name') and contains(text(), '${player_name}')]
+
+    # Retrieve the ranking points
     ${points}=    Get Text    xpath=//tr[td[text()='Punkty rankingowe:']]//a[contains(@class, 'name')]
     Log To Console    Player: ${player_name} found, ranking points: ${points}.
-    Return From Keyword    ${points}
 
+    # Return the ranking points
+    Return From Keyword    ${points}
