@@ -21,26 +21,16 @@ class SudokuGUI:
         """Create the 9x9 Sudoku grid."""
         frame = tk.Frame(self.root)
         frame.pack()
-        for row in range(9):
-            for col in range(9):
-                entry = self.create_cell(frame, row, col)
-                self.entries[row][col] = entry
-                if self.grid[row][col] != 0:
-                    self.fill_cell(entry, self.grid[row][col])
+        self.traverse_grid(lambda r, c: self.init_cell(frame, r, c))
 
-    def create_cell(self, frame, row, col):
-        """Create a single cell in the Sudoku grid."""
+    def init_cell(self, frame, row, col):
+        """Initialize a single cell in the Sudoku grid."""
         bg_color = "#d1e7dd" if (row // 3 + col // 3) % 2 == 0 else "#f8d7da"
-        entry = tk.Entry(
-            frame,
-            width=2,
-            font=("Arial", 16),
-            justify="center",
-            bg=bg_color,
-            relief=tk.RIDGE,
-        )
+        entry = tk.Entry(frame, width=2, font=("Arial", 16), justify="center", bg=bg_color, relief=tk.RIDGE)
         entry.grid(row=row, column=col, padx=2, pady=2)
-        return entry
+        self.entries[row][col] = entry
+        if self.grid[row][col] != 0:
+            self.set_cell_value(row, col, self.grid[row][col], is_readonly=True)
 
     def create_buttons(self):
         """Create action buttons for the Sudoku game."""
@@ -48,6 +38,7 @@ class SudokuGUI:
         button_frame.pack(pady=10)
 
         buttons = [
+            ("New Game", self.new_game),
             ("Check Solution", self.check_solution),
             ("Reveal Solution", self.reveal_solution),
             ("Reset", self.reset_puzzle),
@@ -56,10 +47,22 @@ class SudokuGUI:
         for text, command in buttons:
             tk.Button(button_frame, text=text, command=command).pack(side=tk.LEFT, padx=5)
 
-    def fill_cell(self, entry, value):
-        """Fill a cell with a given value and disable it."""
+    def set_cell_value(self, row, col, value, is_readonly=False, color="black"):
+        """Set a cell's value, state, and color."""
+        entry = self.entries[row][col]
+        entry.config(state="normal", fg=color)
+        entry.delete(0, tk.END)
         entry.insert(0, str(value))
-        entry.config(state="disabled", disabledforeground="black")
+        if is_readonly:
+            entry.config(state="disabled", disabledforeground="black")
+
+    def traverse_grid(self, func):
+        """Traverse the grid and apply a function to each cell."""
+        for row in range(9):
+            for col in range(9):
+                if func(row, col):  # Allow early exit if the function returns True
+                    return row, col
+        return None
 
     def generate_puzzle(self):
         """Generate a Sudoku puzzle with a valid solution."""
@@ -82,64 +85,87 @@ class SudokuGUI:
 
     def solve(self, grid):
         """Solve the Sudoku puzzle using backtracking."""
-        for row in range(9):
-            for col in range(9):
-                if grid[row][col] == 0:
-                    for num in range(1, 10):
-                        if self.is_valid(grid, row, col, num):
-                            grid[row][col] = num
-                            if self.solve(grid):
-                                return True
-                            grid[row][col] = 0
-                    return False
-        return True
+
+        def find_empty_cell(row, col):
+            """Check if the current cell is empty."""
+            return grid[row][col] == 0
+
+        empty_cell = self.traverse_grid(find_empty_cell)
+        if not empty_cell:
+            return True  # Puzzle solved
+
+        row, col = empty_cell
+        for num in range(1, 10):
+            if self.is_valid(grid, row, col, num):
+                grid[row][col] = num
+                if self.solve(grid):
+                    return True
+                grid[row][col] = 0
+
+        return False
 
     def check_solution(self):
         """Check if the user's solution matches the actual solution."""
         has_errors = False
-        for row in range(9):
-            for col in range(9):
-                user_input = self.entries[row][col].get()
-                correct_value = self.solution[row][col]
-                if not user_input.isdigit() or int(user_input) != correct_value:
-                    self.entries[row][col].config(bg="red")
-                    has_errors = True
-                else:
-                    self.entries[row][col].config(bg="white")
+
+        def validate(row, col):
+            nonlocal has_errors
+            if not self.validate_and_mark_cell(row, col):
+                has_errors = True
+
+        self.traverse_grid(validate)
         return not has_errors
 
-    def get_cell_value(self, row, col):
-        """Get the integer value of a cell, or return 0 if invalid."""
-        value = self.entries[row][col].get()
-        return int(value) if value.isdigit() else 0
-
-    def mark_cell(self, row, col, is_correct):
-        """Mark a cell as correct or incorrect."""
-        color = "black" if is_correct else "red"
-        self.entries[row][col].config(fg=color)
+    def validate_and_mark_cell(self, row, col):
+        """Validate a cell's input against the solution and mark errors."""
+        user_input = self.entries[row][col].get()
+        correct_value = self.solution[row][col]
+        if not user_input.isdigit() or int(user_input) != correct_value:
+            self.entries[row][col].config(bg="red")
+            return False
+        self.entries[row][col].config(bg="white")
+        return True
 
     def reveal_solution(self):
         """Reveal the correct solution in the grid."""
-        for row in range(9):
-            for col in range(9):
-                self.entries[row][col].config(state="normal", fg="black")
-                self.entries[row][col].delete(0, tk.END)
-                self.entries[row][col].insert(0, str(self.solution[row][col]))
-                if self.grid[row][col] != 0:
-                    self.entries[row][col].config(state="disabled", disabledforeground="black")
+        self.traverse_grid(lambda r, c: self.set_cell_value(r, c, self.solution[r][c], is_readonly=(self.grid[r][c] != 0)))
 
     def reset_puzzle(self):
-        """Reset the grid to its original state."""
-        for row in range(9):
-            for col in range(9):
-                entry = self.entries[row][col]
-                if self.grid[row][col] == 0:
-                    entry.config(state="normal", fg="black")
-                    entry.delete(0, tk.END)
-                else:
-                    entry.delete(0, tk.END)
-                    entry.insert(0, str(self.grid[row][col]))
-                    entry.config(state="disabled", disabledforeground="black")
+        """Reset the grid to its original state and restore original cell colors."""
+
+        def reset_cell(row, col):
+            entry = self.entries[row][col]
+            # Determine the original background color
+            bg_color = "#d1e7dd" if (row // 3 + col // 3) % 2 == 0 else "#f8d7da"
+            # Reset the cell content and colors
+            if self.grid[row][col] == 0:
+                entry.config(state="normal", fg="black", bg=bg_color)
+                entry.delete(0, tk.END)  # Clear the cell
+            else:
+                entry.delete(0, tk.END)  # Reset the cell to its original value
+                entry.insert(0, str(self.grid[row][col]))
+                entry.config(state="disabled", disabledforeground="black", bg=bg_color)
+
+        self.traverse_grid(reset_cell)
+
+    def new_game(self):
+        """Start a new Sudoku game with a fresh puzzle."""
+        self.grid = [[0 for _ in range(9)] for _ in range(9)]  # Reset the grid
+        self.generate_puzzle()  # Generate a new puzzle
+        self.solution = [row[:] for row in self.grid]  # Update the solution
+
+        def reset_to_new_game(row, col):
+            entry = self.entries[row][col]
+            bg_color = "#d1e7dd" if (row // 3 + col // 3) % 2 == 0 else "#f8d7da"
+            if self.grid[row][col] == 0:
+                entry.config(state="normal", fg="black", bg=bg_color)
+                entry.delete(0, tk.END)  # Clear editable cells
+            else:
+                entry.delete(0, tk.END)  # Set the new puzzle value
+                entry.insert(0, str(self.grid[row][col]))
+                entry.config(state="disabled", disabledforeground="black", bg=bg_color)
+
+        self.traverse_grid(reset_to_new_game)
 
 
 if __name__ == "__main__":
