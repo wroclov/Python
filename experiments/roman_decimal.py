@@ -1,3 +1,4 @@
+import re
 class RomanNumerals:
     # Static dictionary to map single Roman numerals to their integer values
     roman_to_int_map = {
@@ -21,26 +22,30 @@ class RomanNumerals:
         ]
         return ''.join(result)
 
+    @staticmethod
     def from_roman(roman_num: str) -> int:
-        roman_to_int_map = RomanNumerals.roman_to_int_map
+        # Regular expression for valid Roman numerals
+        valid_roman_regex = re.compile(
+                r"^M{0,4}"  # Thousands: 0-4 M's
+                r"(CM|CD|D?C{0,3})"  # Hundreds: 900 (CM), 400 (CD), 0-300 (C, CC, CCC), or 500 (D)
+                r"(XC|XL|L?X{0,3})"  # Tens: 90 (XC), 40 (XL), 0-30 (X, XX, XXX), or 50 (L)
+                r"(IX|IV|V?I{0,3})$"  # Units: 9 (IX), 4 (IV), 0-3 (I, II, III), or 5 (V)
+            )
+
+        # Validate the Roman numeral
+        if not valid_roman_regex.match(roman_num):
+            raise ValueError(f"Invalid Roman numeral: {roman_num}")
+
+        # Convert valid Roman numeral to integer
         final_number = 0
         prev_value = 0
 
-        # Iterate over the Roman numeral from left to right
-        for i, char in enumerate(roman_num):
-            if char not in roman_to_int_map:
-                raise ValueError(f"Invalid Roman numeral character: {char}")
-
-            current_value = roman_to_int_map[char]
-
-            if i > 0 and current_value > roman_to_int_map[roman_num[i - 1]]:
-                # Ensure this is a valid subtractive combination
-                if roman_num[i - 1] + char not in ["IV", "IX", "XL", "XC", "CD", "CM"]:
-                    raise ValueError(f"Invalid subtractive combination: {roman_num[i - 1]}{char}")
+        for char in roman_num:
+            current_value = RomanNumerals.roman_to_int_map[char]
+            if current_value > prev_value:
                 final_number += current_value - 2 * prev_value
             else:
                 final_number += current_value
-
             prev_value = current_value
 
         return final_number
