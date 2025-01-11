@@ -27,15 +27,15 @@ def test_to_roman(input_val, expected):
 def test_from_roman(input_val, expected):
     assert RomanNumerals.from_roman(input_val) == expected
 
-def test_invalid_roman_numerals():
+@pytest.mark.parametrize("input_val", [
+    ("MMMMM"),
+    ("IIII"),
+    ("VX"),
+    ("ABC")
+])
+def test_invalid_roman_numerals(input_val):
     with pytest.raises(ValueError, match="Invalid Roman numeral character"):
-        RomanNumerals.from_roman("MMMMM")  # Invalid numeral
-    with pytest.raises(ValueError, match="Invalid Roman numeral character"):
-        RomanNumerals.from_roman("IIII")   # Invalid numeral
-    with pytest.raises(ValueError, match="Invalid Roman numeral character"):
-        RomanNumerals.from_roman("VX")     # Invalid sequence
-    with pytest.raises(ValueError, match="Invalid Roman numeral character"):
-        RomanNumerals.from_roman("ABC")    # Completely invalid string
+        RomanNumerals.from_roman(input_val)  # Invalid numeral
 
 def test_large_numbers():
     assert RomanNumerals.to_roman(4000) == "MMMM"
