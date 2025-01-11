@@ -34,7 +34,7 @@ def test_from_roman(input_val, expected):
     ("ABC")
 ])
 def test_invalid_roman_numerals(input_val):
-    with pytest.raises(ValueError, match="Invalid Roman numeral character"):
+    with pytest.raises(ValueError, match=r"Invalid Roman numeral"):
         RomanNumerals.from_roman(input_val)  # Invalid numeral
 
 def test_large_numbers():
