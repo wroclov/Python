@@ -41,44 +41,87 @@ class SimpleNN(nn.Module):
         x = self.fc3(x)  # No activation for output layer (handled by loss function)
         return x
 
-# Initialize the model
-model = SimpleNN()
+# Convolutional Neural Network
+class AdvancedCNN(nn.Module):
+    def __init__(self):
+        super(AdvancedCNN, self).__init__()
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=3, padding=1)  # Output: 32x28x28
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)  # Output: 64x28x28
+        self.pool = nn.MaxPool2d(2, 2) # Downsample by 2x: Output: 64x14x14
+        self.dropout1 = nn.Dropout(0.25) # Dropout for regularization
+        self.fc1 = nn.Linear(64 * 14 * 14, 128) # Fully connected layer
+        self.dropout2 = nn.Dropout(0.5)
+        self.fc2 = nn.Linear(128, 10) # Output layer
 
-# Define loss function (CrossEntropyLoss for classification tasks)
-criterion = nn.CrossEntropyLoss()
+    def forward(self, x):
+        x = torch.relu(self.conv1(x)) # First convolution + ReLU
+        x = torch.relu(self.conv2(x)) # Second convolution + ReLU
+        x = self.pool(x) # Pooling
+        x = self.dropout1(x) # Dropout
+        x = x.view(-1, 64 * 14 * 14) # Flatten the feature map
+        x = torch.relu(self.fc1(x)) # Fully connected layer + ReLU
+        x = self.dropout2(x) # Dropout
+        x = self.fc2(x) # Output layer
+        return x
 
-# Define optimizer (Adam optimizer with a learning rate of 0.001)
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+# Training and Evaluation Function
+def train_and_evaluate(model, model_name, num_epochs=5):
+    # Define loss function (CrossEntropyLoss for classification tasks)
+    criterion = nn.CrossEntropyLoss()
+    # Define optimizer (Adam optimizer with a learning rate of 0.001)
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-# Training the model
-num_epochs = 5
-for epoch in range(num_epochs):
-    model.train()
-    running_loss = 0.0  # Track loss for the epoch
+    # Training loop
+    for epoch in range(num_epochs):
+        model.train()
+        running_loss = 0.0 # Track loss for the epoch
+        for inputs, labels in train_loader:
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward() # Backward pass
+            optimizer.step() # Update weights
+            running_loss += loss.item()
+        print(f"{model_name} - Epoch {epoch + 1}/{num_epochs}, Loss: {running_loss / len(train_loader):.4f}")
 
-    for inputs, labels in train_loader:
-        optimizer.zero_grad()  # Reset gradients
-        outputs = model(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()  # Backward pass
-        optimizer.step()  # Update weights
-        running_loss += loss.item()
+    # Evaluation
+    model.eval()
+    correct = 0
+    total = 0
+    with torch.no_grad(): # Disable gradient computation
+        for inputs, labels in test_loader:
+            outputs = model(inputs) # forward pass
+            _, predicted = torch.max(outputs, 1) # Get predicted class
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item() # Count correct predictions
+    accuracy = 100 * correct / total
+    print(f"{model_name} Test Accuracy: {accuracy:.2f}%")
+    return accuracy
 
-    # Print average loss for the epoch
-    print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {running_loss / len(train_loader):.4f}")
+# Main Execution
+def main():
+    print("Choose model(s) to train and evaluate:")
+    print("1. Simple Neural Network")
+    print("2. Advanced Convolutional Neural Network")
+    print("3. Both")
 
-# Evaluate the model
-model.eval()  # Set the model to evaluation mode
-correct = 0
-total = 0
+    choice = int(input("Enter your choice (1/2/3): "))
+    if choice == 1:
+        print("\nTraining Simple Neural Network...\n")
+        train_and_evaluate(SimpleNN(), "Simple Neural Network")
+    elif choice == 2:
+        print("\nTraining Advanced Convolutional Neural Network...\n")
+        train_and_evaluate(AdvancedCNN(), "Advanced Convolutional Neural Network")
+    elif choice == 3:
+        print("\nTraining Simple Neural Network...\n")
+        simple_acc = train_and_evaluate(SimpleNN(), "Simple Neural Network")
+        print("\nTraining Advanced Convolutional Neural Network...\n")
+        cnn_acc = train_and_evaluate(AdvancedCNN(), "Advanced Convolutional Neural Network")
+        print(f"\nComparison: Simple NN Accuracy: {simple_acc:.2f}% vs CNN Accuracy: {cnn_acc:.2f}%")
+    else:
+        print("Invalid choice. Exiting.")
 
-with torch.no_grad():  # Disable gradient computation
-    for inputs, labels in test_loader:
-        outputs = model(inputs)  # Forward pass
-        _, predicted = torch.max(outputs, 1)  # Get predicted class
-        total += labels.size(0)  # Total number of samples
-        correct += (predicted == labels).sum().item()  # Count correct predictions
+# Run the program
+if __name__ == "__main__":
+    main()
 
-# Print final accuracy
-accuracy = 100 * correct / total
-print(f"Test Accuracy: {accuracy:.2f}%")
