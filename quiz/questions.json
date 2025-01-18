@@ -1,0 +1,312 @@
+[
+    {
+        "question": "What is the keyword to define a function in Python?",
+        "options": ["def", "function", "lambda", "func"],
+        "answer": "def"
+    },
+    {
+        "question": "Which of the following is a mutable data type in Python?",
+        "options": ["tuple", "list", "string", "int"],
+        "answer": "list"
+    },
+    {
+        "question": "What does PEP stand for in Python?",
+        "options": ["Python Enhanced Proposal", "Python Execution Plan", "Python Enhancement Proposal", "Program Execution Protocol"],
+        "answer": "Python Enhancement Proposal"
+    },
+    {
+        "question": "Which of these is used to handle exceptions in Python?",
+        "options": ["try-except", "catch-throw", "do-catch", "error-check"],
+        "answer": "try-except"
+    },
+    {
+        "question": "What is the output of print(2 ** 3)?",
+        "options": ["5", "8", "6", "9"],
+        "answer": "8"
+    },
+    {
+        "question": "Which keyword is used to create a class in Python?",
+        "options": ["class", "struct", "object", "define"],
+        "answer": "class"
+    },
+    {
+        "question": "Which method is used to add an element to a list?",
+        "options": ["add()", "append()", "insert()", "push()"],
+        "answer": "append()"
+    },
+    {
+        "question": "What is the default value of the end parameter in print()?",
+        "options": ["\\n", "space", "None", "\\t"],
+        "answer": "\\n"
+    },
+    {
+        "question": "What will be the result of the following code: print(int(34.88))",
+        "options": ["34.88", "35", "34", "34.9"],
+        "answer": "34"
+    },
+    {
+    "question": "What will be the output of the following Python code?\n\nnumbers = [1, 2, 3, 4, 5]\nsquares = [x**2 for x in numbers if x % 2 == 0]\nprint(squares)",
+    "options": ["[1, 4, 9, 16, 25]", "[1, 9, 25]", "[4, 16]", "[2, 4]"],
+    "answer": "[4, 16]"
+    },
+    {
+    "question": "What will be the output of the following Python code?\n\nnumbers = [1, 2, 3, 4, 5]\na, *b, c = numbers\nprint(a, b, c)",
+    "options": [
+        "1 [2, 3, 4] 5",
+        "1 [1, 2, 3, 4] 5",
+        "1 [2, 3] 4",
+        "Error: Too many values to unpack"
+    ],
+    "answer": "1 [2, 3, 4] 5"
+    },
+    {
+    "question": "What is the main difference between the `__str__` and `__repr__` methods in Python?",
+    "options": [
+        "`__str__` is for creating an official string representation of an object, while `__repr__` is for user-friendly output.",
+        "`__repr__` is for creating an official string representation of an object, while `__str__` is for user-friendly output.",
+        "`__repr__` is used for formatting strings, while `__str__` is used for concatenation.",
+        "There is no difference between `__str__` and `__repr__`."
+    ],
+    "answer": "`__repr__` is for creating an official string representation of an object, while `__str__` is for user-friendly output."
+    },
+    {
+    "question": "What will be the output of the following code?\n\nclass MyList:\n    def __init__(self, items):\n        self.items = items\n\n    def __len__(self):\n        return len(self.items)\n\nml = MyList([10, 20, 30, 40])\nprint(len(ml))",
+    "options": [
+        "4",
+        "0",
+        "TypeError: object of type 'MyList' has no len()",
+        "None"
+    ],
+    "answer": "4"
+    },
+    {
+    "question": "What will be the output of the following code?\n\nnumbers = [1, 2, 3, 4]\nprint(list(map(lambda x: x**2, numbers)))",
+    "options": [
+        "[1, 4, 9, 16]",
+        "[1, 2, 3, 4]",
+        "[2, 4, 6, 8]",
+        "[4, 8, 12, 16]"
+    ],
+    "answer": "[1, 4, 9, 16]"
+    },
+    {
+    "question": "What will be the output of the following code?\n\ndef greet(name='User'):\n    return f'Hello, {name}!'\nprint(greet())",
+    "options": [
+        "'Hello, User!'",
+        "'Hello!'",
+        "TypeError: greet() missing 1 required positional argument: 'name'",
+        "'Hello, None!'"
+    ],
+    "answer": "'Hello, User!'"
+    },
+    {
+    "question": "What will be the output of the following code?\n\nlst = [1, 2, 3, 4, 5]\nprint(sum(lst))",
+    "options": [
+        "15",
+        "[1, 2, 3, 4, 5]",
+        "5",
+        "None"
+    ],
+    "answer": "15"
+    },
+    {
+    "question": "What will be the output of the following code?\n\nx = 5\ndef func():\n    x = 10\n    print(x)\nfunc()\nprint(x)",
+    "options": [
+        "10\n5",
+        "5\n5",
+        "10\n10",
+        "Error"
+    ],
+    "answer": "10\n5"
+    },
+    {
+    "question": "What will be the output of the following code?\n\nfrom functools import reduce\nnumbers = [1, 2, 3, 4]\nresult = reduce(lambda x, y: x + y, numbers)\nprint(result)",
+    "options": [
+        "10",
+        "24",
+        "4",
+        "None"
+    ],
+    "answer": "10"
+    },
+    {
+    "question": "What will be the output of the following code?\n\nnumbers = [1, 2, 3, 4]\nsquared = map(lambda x: x**2, numbers)\nprint(list(squared))",
+    "options": [
+        "[1, 4, 9, 16]",
+        "[2, 4, 6, 8]",
+        "[1, 2, 3, 4]",
+        "[4, 8, 12, 16]"
+    ],
+    "answer": "[1, 4, 9, 16]"
+    },
+    {
+        "question": "Which of the following will output the string `Python`?\n\nPython is awesome\"\nprint(s[0:6])",
+        "options": [
+            "Python",
+            "is awe",
+            "Python is",
+            "is awes"
+        ],
+        "answer": "Python"
+    },
+    {
+        "question": "What will be the output of the following code?\n\ndef foo(x, y=[]):\n    y.append(x)\n    return y\n\nprint(foo(1))\nprint(foo(2, []))\nprint(foo(3))",
+        "options": [
+            "[1] [2] [3]",
+            "[1] [] [3]",
+            "[1] [2] [1, 3]",
+            "[1, 3] [2] [3]"
+        ],
+        "answer": "[1] [2] [1, 3]"
+    },
+    {
+        "question": "What does the following Python code print?\n\na = [1, 2, 3]\nb = a\nb.append(4)\nprint(a)",
+        "options": [
+            "[1, 2, 3, 4]",
+            "[4, 1, 2, 3]",
+            "[1, 2, 3]",
+            "[4]"
+        ],
+        "answer": "[1, 2, 3, 4]"
+    },
+    {
+        "question": "What is the output of this code?\n\nx = {1, 2, 3}\ny = {3, 4, 5}\nprint(x & y)",
+        "options": [
+            "{1, 2, 3, 4, 5}",
+            "{3}",
+            "{1, 2}",
+            "{4, 5}"
+        ],
+        "answer": "{3}"
+    },
+    {
+        "question": "Which of the following will correctly remove the first occurrence of `3` in the list `lst`?\n\nlst = [1, 2, 3, 4, 3]",
+        "options": [
+            "lst.remove(3)",
+            "lst.pop(3)",
+            "lst.delete(3)",
+            "lst.discard(3)"
+        ],
+        "answer": "lst.remove(3)"
+    },
+    {
+        "question": "What will the following code output? \n\nx = 'hello'\ny = 'world'\nz = x + y\nprint(z[1::2])",
+        "options": [
+            "hll",
+            "elol",
+            "elr",
+            "lrd"
+        ],
+        "answer": "elr"
+    },
+    {
+        "question": "What will be the output of the following code?\n\nnumbers = [1, 2, 3, 4]\nsquared = map(lambda x: x**2, numbers)\nprint(list(squared))",
+        "options": [
+            "[1, 4, 9, 16]",
+            "[2, 4, 6, 8]",
+            "[1, 2, 3, 4]",
+            "[4, 8, 12, 16]"
+        ],
+        "answer": "[1, 4, 9, 16]"
+    },
+    {
+        "question": "What will be the output of the following code?\n\nx = {1, 2, 3}\ny = x.copy()\ny.add(4)\nprint(x)",
+        "options": [
+            "{1, 2, 3}",
+            "{1, 2, 3, 4}",
+            "{4}",
+            "{1, 2, 3, 4, 4}"
+        ],
+        "answer": "{1, 2, 3}"
+    },
+    {
+        "question": "What will be the output of the following code?\n\ndef bar(x):\n    return x / 2\n\nprint(bar(4))\nprint(bar('four'))",
+        "options": [
+            "Error in bar(4)",
+            "Error in bar('four')",
+            "No error",
+            "Error in both calls"
+        ],
+        "answer": "Error in bar('four')"
+    },
+    {
+        "question": "What will be the result of the following code?\n\na = '123'\nb = '456'\nc = a + b\nprint(c[2:5])",
+        "options": [
+            "'12345'",
+            "'234'",
+            "'345'",
+            "'3456'"
+        ],
+        "answer": "'345'"
+    },
+    {
+        "question": "What will be the output of the following code?\n\nkeys = ['a', 'b', 'c']\nvalues = [1, 2, 3]\nd = dict(zip(keys, values))\nprint(d)",
+        "options": [
+            "{'a': 1, 'b': 2, 'c': 3}",
+            "{'a': '1', 'b': '2', 'c': '3'}",
+            "{'a': 1, 'b': 2}",
+            "Error in zip"
+        ],
+        "answer": "{'a': 1, 'b': 2, 'c': 3}"
+    },
+    {
+        "question": "What will be the output of the following code?\n\n```python\ndef my_gen():\n    yield 1\n    yield 2\n    yield 3\n\ngen = my_gen()\nprint(next(gen))\nprint(next(gen))\n```",
+        "options": [
+            "1 2",
+            "1 3",
+            "1 2 3",
+            "Error"
+        ],
+        "answer": "1 2"
+    },
+    {
+        "question": "What is the main advantage of using generators in Python?",
+        "options": [
+            "They can handle infinite sequences without using memory",
+            "They are faster than regular functions",
+            "They are easier to implement than regular functions",
+            "They do not require any parameters"
+        ],
+        "answer": "They can handle infinite sequences without using memory"
+    },
+    {
+        "question": "What does the following code output?\n\n```python\ndef count_up_to(n):\n    count = 1\n    while count <= n:\n        yield count\n        count += 1\n\ncounter = count_up_to(3)\nfor number in counter:\n    print(number)\n```",
+        "options": [
+            "1 2 3",
+            "1 2",
+            "1 3",
+            "1 2 3 4"
+        ],
+        "answer": "1 2 3"
+    },
+    {
+        "question": "What is the behavior of the `yield` statement in a function?",
+        "options": [
+            "It returns the value and terminates the function",
+            "It pauses the function and resumes from the yield point when called again",
+            "It throws an exception",
+            "It can only be used in lambda functions"
+        ],
+        "answer": "It pauses the function and resumes from the yield point when called again"
+    },
+    {
+        "question": "What will be the output of the following code?\n\n```python\ndef gen():\n    yield 1\n    yield 2\n    return 3\n    yield 4\n\ng = gen()\nprint(next(g))\nprint(next(g))\nprint(next(g))\n```",
+        "options": [
+            "1 2 3",
+            "1 2",
+            "1 2 Error",
+            "1 2 4"
+        ],
+        "answer": "1 2"
+    },
+    {
+        "question": "What is the output of the following code?\n\n```python\ndef my_gen():\n    yield 'a'\n    yield 'b'\n    yield 'c'\n\ngen = my_gen()\nresult = list(gen)\nprint(result)\n```",
+        "options": [
+            "['a', 'b', 'c']",
+            "['a', 'b']",
+            "['a', 'b', 'c', 'd']",
+            "['a']"
+        ],
+        "answer": "['a', 'b', 'c']"
+    }
+]
