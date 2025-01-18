@@ -194,10 +194,10 @@
         "options": [
             "hll",
             "elol",
-            "elr",
+            "elwrd",
             "lrd"
         ],
-        "answer": "elr"
+        "answer": "elwrd"
     },
     {
         "question": "What will be the output of the following code?\n\nnumbers = [1, 2, 3, 4]\nsquared = map(lambda x: x**2, numbers)\nprint(list(squared))",
