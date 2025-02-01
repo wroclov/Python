@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+service MathService {
+  rpc Calculate (MathRequest) returns (MathResponse);
+}
+
+message MathRequest {
+  string operation = 1;
+  double a = 2;
+  double b = 3;
+}
+
+message MathResponse {
+  double result = 1;
+  string error = 2;
+}
