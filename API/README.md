@@ -1,4 +1,4 @@
-Steps to build and run project.
+Steps to build and run project. \
 rest_api \
 uvicorn rest_api:app --host 0.0.0.0 --port 8000
 
