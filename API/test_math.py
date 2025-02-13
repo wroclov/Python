@@ -39,7 +39,7 @@ async def test_websocket_api():
         assert response_data.get("error") is None  # Ensure no errors
 
 
-# Run WebSocket test asynchronously as this is true nature of this API
+# Run WebSocket test asynchronously as this is a true nature of this API
 if __name__ == "__main__":
     test_rest_api()
     test_grpc_api()
