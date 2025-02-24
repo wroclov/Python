@@ -1,4 +1,4 @@
-Flask server I provided has three API endpoints, each handling different HTTP methods.
+Flask server has three API endpoints, each handling different HTTP methods.
 
 locust: \
 http://localhost:8089 
