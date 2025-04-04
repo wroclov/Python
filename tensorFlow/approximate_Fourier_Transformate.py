@@ -73,6 +73,13 @@ y_test_denorm = y_test * y_std + y_mean
 
 # Visualize a prediction
 import random
+from sklearn.metrics import mean_squared_error
+
+# Compute MSE
+mse = mean_squared_error(y_test_denorm, y_pred)
+print(f"Mean Squared Error (MSE) on test set: {mse:.4f}")
+
+# Visualize a prediction
 sample_idx = random.randint(0, len(x_test) - 1)
 
 plt.figure(figsize=(12, 5))
@@ -84,7 +91,7 @@ plt.title("Time-Domain Signal")
 plt.subplot(1, 2, 2)
 plt.plot(y_test_denorm[sample_idx], label="True FFT", linestyle="dashed")
 plt.plot(y_pred[sample_idx], label="Predicted FFT", linestyle="solid")
-plt.title("Fourier Coefficients (Real Part)")
+plt.title(f"Fourier Coefficients - Real Part (MSE: {mse:.4f})")
 plt.legend()
 
 plt.tight_layout()
