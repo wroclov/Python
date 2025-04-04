@@ -3,6 +3,10 @@ import tensorflow as tf
 from tensorflow import keras
 import matplotlib.pyplot as plt
 
+# Set random seeds for reproducibility
+np.random.seed(42)
+tf.random.set_seed(42)
+
 
 # Generate training data: Time-domain signals (sum of sine waves)
 def generate_signal(num_samples=1000, num_points=128):
@@ -18,9 +22,9 @@ def generate_signal(num_samples=1000, num_points=128):
         signal = sum(amp * np.sin(freq * x_values + p) for amp, freq, p in zip(amps, freqs, phase))
         signals.append(signal)
 
-        # Compute Discrete Fourier Transform (DFT)
-        fourier_transform = np.fft.fft(signal).real  # Use only real part for simplicity
-        fourier_coeffs.append(fourier_transform[:num_points // 2])  # Only keep first half (symmetry)
+        # Compute Discrete Fourier Transform (DFT), using only real part
+        fourier_transform = np.fft.rfft(signal).real  # Use rfft to automatically handle real input
+        fourier_coeffs.append(fourier_transform)
 
     return np.array(signals), np.array(fourier_coeffs)
 
@@ -28,44 +32,60 @@ def generate_signal(num_samples=1000, num_points=128):
 # Generate dataset
 num_samples = 2000
 num_points = 128
-x_train, y_train = generate_signal(num_samples, num_points)
+x_data, y_data = generate_signal(num_samples, num_points)
 
-# Split into training and test sets
+# Normalize input and output
+x_mean, x_std = x_data.mean(), x_data.std()
+y_mean, y_std = y_data.mean(), y_data.std()
+
+x_data = (x_data - x_mean) / x_std
+y_data = (y_data - y_mean) / y_std
+
+# Train/test split
 split_idx = int(0.8 * num_samples)
-x_test, y_test = x_train[split_idx:], y_train[split_idx:]
-x_train, y_train = x_train[:split_idx], y_train[:split_idx]
+x_train, y_train = x_data[:split_idx], y_data[:split_idx]
+x_test, y_test = x_data[split_idx:], y_data[split_idx:]
 
-# Build the neural network model
+# Reshape for Conv1D: (samples, timesteps, channels)
+x_train_cnn = x_train[..., np.newaxis]
+x_test_cnn = x_test[..., np.newaxis]
+
+# Build the Conv1D model
 model = keras.Sequential([
-    keras.layers.Dense(256, activation='relu', input_shape=(num_points,)),  # Input: Time-domain signal
+    keras.layers.Conv1D(32, kernel_size=5, activation='relu', input_shape=(num_points, 1)),
+    keras.layers.MaxPooling1D(pool_size=2),
+    keras.layers.Conv1D(64, kernel_size=5, activation='relu'),
+    keras.layers.Flatten(),
     keras.layers.Dense(128, activation='relu'),
-    keras.layers.Dense(num_points // 2)  # Output: Fourier coefficients
+    keras.layers.Dense(y_train.shape[1])  # Output: number of FFT real coefficients
 ])
 
 # Compile the model
 model.compile(optimizer='adam', loss='mse')
 
 # Train the model
-model.fit(x_train, y_train, epochs=10, batch_size=32, verbose=1)
+model.fit(x_train_cnn, y_train, epochs=10, batch_size=32, verbose=1)
 
-# Test the model
-y_pred = model.predict(x_test)
+# Predict and de-normalize
+y_pred = model.predict(x_test_cnn)
+y_pred = y_pred * y_std + y_mean
+y_test_denorm = y_test * y_std + y_mean
 
-# Visualize results
-plt.figure(figsize=(10, 5))
+# Visualize a prediction
+import random
+sample_idx = random.randint(0, len(x_test) - 1)
 
-# Choose a sample index to visualize
-sample_idx = np.random.randint(0, len(x_test))
+plt.figure(figsize=(12, 5))
 
 plt.subplot(1, 2, 1)
-plt.plot(x_test[sample_idx], label="Original Signal")
+plt.plot(x_test[sample_idx])
 plt.title("Time-Domain Signal")
-plt.legend()
 
 plt.subplot(1, 2, 2)
-plt.plot(y_test[sample_idx], label="True Fourier Coefficients", linestyle="dashed")
-plt.plot(y_pred[sample_idx], label="NN Approximation", linestyle="solid")
-plt.title("Fourier Transform Approximation")
+plt.plot(y_test_denorm[sample_idx], label="True FFT", linestyle="dashed")
+plt.plot(y_pred[sample_idx], label="Predicted FFT", linestyle="solid")
+plt.title("Fourier Coefficients (Real Part)")
 plt.legend()
 
+plt.tight_layout()
 plt.show()
