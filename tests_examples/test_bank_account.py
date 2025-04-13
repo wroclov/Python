@@ -26,8 +26,9 @@ def test_negative_deposit(default_account):
 
 @pytest.mark.parametrize("amount, expected", [
     (0, 100),
+    (0.01, 100.01),
     (60, 160),
-    (400, 500),
+    (9999, 10099),
 ])
 def test_multiple_deposits(amount, expected):
     account = BankAccount("John", 100)
