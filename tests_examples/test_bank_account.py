@@ -8,17 +8,33 @@ def default_account():
 def test_initial_balance(default_account):
     assert default_account.get_balance() == 100
 
-def test_deposit(default_account):
-    default_account.deposit(70)
-    assert default_account.get_balance() == 170
+@pytest.mark.parametrize("amount, expected", [
+    (0, 100),
+    (0.01, 100.01),
+    (70, 170),
+    (999_999_999_999, 1_000_000_000_099),
+])
+def test_deposit(default_account, amount, expected):
+    default_account.deposit(amount)
+    assert default_account.get_balance() == expected
 
-def test_withdraw(default_account):
-    default_account.withdraw(40)
-    assert default_account.get_balance() == 60
+@pytest.mark.parametrize("amount, expected_balance", [
+    (0.01, 99.99),
+    (40, 60),
+    (100, 0),
+])
+def test_valid_withdrawals(default_account, amount, expected_balance):
+    default_account.withdraw(amount)
+    assert default_account.get_balance() == expected_balance
 
-def test_withdraw_insufficient_funds(default_account):
-    with pytest.raises(InsufficientFundsError):
-        default_account.withdraw(300)
+@pytest.mark.parametrize("invalid_amount, expected_exception", [
+    (-1, ValueError),
+    (0, ValueError),
+    (101, InsufficientFundsError),
+])
+def test_invalid_withdrawals(default_account, invalid_amount, expected_exception):
+    with pytest.raises(expected_exception):
+        default_account.withdraw(invalid_amount)
 
 def test_negative_deposit(default_account):
     with pytest.raises(ValueError):
