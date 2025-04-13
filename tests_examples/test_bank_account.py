@@ -51,9 +51,10 @@ def test_transfer_insufficient_funds(mark_account, alice_account):
     with pytest.raises(InsufficientFundsError):
         mark_account.transfer_to(alice_account, 200)
 
-def test_transfer_negative_amount(alice_account, mark_account):
+@pytest.mark.parametrize("invalid_amount", [-1, -20, 0])
+def test_transfer_negative_amount(alice_account, mark_account, invalid_amount):
     with pytest.raises(ValueError):
-        alice_account.transfer_to(mark_account, -20)
+        alice_account.transfer_to(mark_account, invalid_amount)
 
 def test_multiple_account_balances(alice_account, mark_account):
     charlie_account = BankAccount("Charlie", 300)
