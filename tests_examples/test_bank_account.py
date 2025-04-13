@@ -8,6 +8,9 @@ def default_account():
 def test_initial_balance(default_account):
     assert default_account.get_balance() == 100
 
+def test_initial_owner(default_account):
+    assert default_account.get_owner() == "Bob"
+
 @pytest.mark.parametrize("amount, expected", [
     (0, 100),
     (0.01, 100.01),
