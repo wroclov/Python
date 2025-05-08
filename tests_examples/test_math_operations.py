@@ -42,11 +42,14 @@ def test_multiply(a, b, expected):
 def test_power(a, b, expected):
     assert power(a, b) == expected
 
-
 @pytest.mark.divide
-def test_divide_valid():
-    assert divide(10, 2) == 5
-    assert divide(99999, -9) == -11111
+@pytest.mark.parametrize("a, b, expected",[
+    (10, 2, 5),
+    (99999, -9, -11111),
+    (5, 0.01, 500),
+])
+def test_divide_valid(a, b, expected):
+    assert pytest.approx(divide(a, b), abs=0.0001) == expected
 
 @pytest.mark.divide
 def test_divide_zero_division():
