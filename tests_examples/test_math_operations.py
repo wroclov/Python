@@ -57,13 +57,13 @@ def test_divide_zero_division():
         divide(10, 0)
 
 @pytest.mark.divide
-def test_divide_float():
-    # Test case for normal division
-    assert divide(10, 4) == 2.5
+@pytest.mark.parametrize("a, b, expected",[
+    (10, 4, Decimal(2.5)),
+    (7.5, -1.1, Decimal('-6.818')),
+])
+def test_divide_float(a, b, expected):
 
-    # Convert the expected value to Decimal and compare
-    expected = Decimal('-6.818')
-    result = divide(7.5, -1.1)
+    result = Decimal(divide(a, b))
 
     # Set a tolerance for the comparison using Decimal's comparison features
     assert abs(result - expected) < Decimal('0.001'), f"Expected: {expected}, but got {result}"
