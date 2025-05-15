@@ -74,22 +74,24 @@ def test_divide_edge_cases():
     assert divide(0, -1) == 0
 
 @pytest.mark.divide
-def test_divide_invalid_strings():
+@pytest.mark.parametrize("a, b",[
+        ('g', 2),
+        ("some text", "other text"),
+])
+def test_divide_invalid_strings(a, b):
     with pytest.raises(TypeError):
-        divide('g', 2)
-    with pytest.raises(TypeError):
-        divide("some text", "other text")
+        divide(a, b)
 
 @pytest.mark.divide
-def test_divide_mixed_invalid_types():
+@pytest.mark.parametrize("a, b",[
+        ([1, 2, 3], 4),
+        (None, -1),
+        (True, True),
+        (False, 1),
+])
+def test_divide_mixed_invalid_types(a, b):
     with pytest.raises(TypeError):
-        divide([1, 2, 3], 4)
-    with pytest.raises(TypeError):
-        divide(None, -1)
-    with pytest.raises(TypeError):
-        divide(True, True)
-    with pytest.raises(TypeError):
-        divide(False, 1)
+        divide(a, b)
 
 
 @pytest.mark.divide
