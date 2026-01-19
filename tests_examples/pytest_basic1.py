@@ -1,7 +1,7 @@
 import pytest
 
 
-#fixture for setup
+# fixture for setup
 @pytest.fixture
 def test_data():
     return [1, 2, 3, 4, 5]
@@ -55,3 +55,4 @@ def test_reversed():
 @pytest.mark.reversed
 def test_reversed_fixture(test_data):
     assert list(reversed(test_data)) == [5, 4, 3, 2, 1]
+
