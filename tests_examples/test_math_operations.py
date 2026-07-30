@@ -42,7 +42,8 @@ def test_multiply(a, b, expected):
 def test_power(a, b, expected):
     assert power(a, b) == expected
 
-@pytest.mark.divide
+
+
 @pytest.mark.parametrize("a, b, expected",[
     (10, 2, 5),
     (99999, -9, -11111),
@@ -50,6 +51,7 @@ def test_power(a, b, expected):
 ])
 def test_divide_valid(a, b, expected):
     assert pytest.approx(divide(a, b), abs=0.0001) == expected
+
 
 @pytest.mark.divide
 def test_divide_zero_division():
@@ -112,5 +114,12 @@ def test_divide_large_numbers():
     # Normalize both expected and actual result to match the precision you care about (e.g., 100 significant digits)
     precision = Decimal('1e-100')
     assert actual_result.quantize(precision) == expected_result.quantize(precision)
+
+@pytest.mark.divide
+def test_divide_very_small_numbers():
+    a = Decimal("1e-1000")
+    b = Decimal("1e10")
+
+    assert divide(a,b) == Decimal("1e-1010")
 
 
